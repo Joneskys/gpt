@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Audio Remote</title>
+  <style>body{font-family:Arial;margin:20px;max-width:700px}input,button,select{padding:8px;margin:4px}</style>
+</head>
+<body>
+  <h2>Remote Audio Control</h2>
+  <p id="msg"></p>
+  <label>Bridge URL <input id="base" value="https://YOURAPP.pythonanywhere.com" style="width:320px"></label>
+
+  <h3>Manual Play</h3>
+  <input id="folder" type="number" value="11" min="1" max="99">
+  <input id="file" type="number" value="1" min="1" max="255">
+  <button onclick="hit('/play',{folder:folder.value,file:file.value})">Play</button>
+
+  <h3>Manual Volume / Mute</h3>
+  <input id="vol" type="number" min="0" max="30" value="20">
+  <button onclick="hit('/vol',{value:vol.value})">Set Vol</button>
+  <button onclick="hit('/mute',{state:1})">Mute</button>
+  <button onclick="hit('/mute',{state:0})">Unmute</button>
+
+  <script>
+    async function hit(path, params){
+      const url = new URL(document.getElementById('base').value + path);
+      Object.keys(params).forEach(k=>url.searchParams.set(k, params[k]));
+      try {
+        const r = await fetch(url.toString());
+        const t = await r.text();
+        msg.innerText = t;
+      } catch(e) {
+        msg.innerText = 'Error: ' + e;
+      }
+    }
+  </script>
+</body>
+</html>
